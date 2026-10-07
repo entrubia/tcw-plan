@@ -136,7 +136,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="d8114be99fbfa3a277dc118a57d2b8f1",ITER=310000;
+const SALT="dc260c9614bb4d5fb226d76ea4e997c6",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -222,8 +222,8 @@ function renderMore(d){
  const cr=C.rows.map(r=>`<tr class="${r.self?"self":""}"><td>${r.name}</td><td class="n">${fmt(r.ig)}</td><td class="n">${fmt(r.tt)}</td><td class="n">${fmt(r.sn)}</td><td class="n">${fmt(r.x)}</td></tr>`).join("");
  document.getElementById("vRivals").innerHTML=`<div class="vh"><h2>المنافسون</h2><p>أرقام الحسابات العامة لمعاهد مشابهة، تُحدّث أول كل شهر. الهدف معرفة سرعة نمونا مقارنة بالسوق.</p></div>
  <div class="tw"><table><thead><tr><th>المعهد</th><th class="n">انستقرام</th><th class="n">تيك توك</th><th class="n">سناب</th><th class="n">إكس</th></tr></thead><tbody>${cr}
- <tr><td colspan="5" class="empty" style="text-align:center;padding:18px">تُضاف المعاهد المنافسة مع أرقامها في تحديث نوفمبر</td></tr></tbody></table></div>
- <p class="empty" style="margin:8px 0 0">المتابعون · ${C.month}</p>`;
+ </tbody></table></div>
+ <p class="empty" style="margin:8px 0 0">المتابعون · ${C.month} · تُعبّأ الأرقام بعد تسجيل نقطة البداية</p>`;
 }
 
 const TABS=["plan","updates","requests","reports","compare","rivals","archive"];
