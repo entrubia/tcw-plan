@@ -136,7 +136,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="4655641a4b1ab6e3f3af208efee4ea9d",ITER=310000;
+const SALT="d8114be99fbfa3a277dc118a57d2b8f1",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -193,34 +193,28 @@ function closeL(){lb.hidden=true;lbc.innerHTML=""}
 
 const fmt=v=>v===null||v===undefined?"—":(typeof v==="number"?v.toLocaleString("en-US"):v);
 function renderViews(d){
- const B=d.baseline;
- let rows="";B.groups.forEach(g=>{rows+=`<tr class="g"><td colspan="4">${g.p}</td></tr>`;g.rows.forEach(r=>rows+=`<tr><td>${r[0]}</td><td class="n">${fmt(r[1])}</td><td class="n">${fmt(r[2])}</td><td class="n empty">1 نوفمبر</td></tr>`)});
  document.getElementById("vReports").innerHTML=`<div class="vh"><h2>التقارير الشهرية</h2><p>تقرير لكل شهر: أرقام كل منصة مقارنة بالشهر السابق، والاستفسارات حسب المنصة، وأفضل المحتوى وأضعفه، وخطة الشهر التالي.</p></div>
  <div class="panel"><div class="arch"><h3>تقرير أكتوبر 2026</h3><span class="tag2">يصدر 1 نوفمبر</span></div>
- <ul><li>أرقام المنصات للشهر كاملًا من 11 أكتوبر</li><li>الاستفسارات الواردة من كل منصة عبر روابط الواتساب</li><li>أداء كل محتوى منشور، وأفضل 3 محتويات</li><li>خطة نوفمبر مبنية على النتائج</li></ul></div>
- <div class="vh"><h2 style="font-size:18px">قبل الخطة</h2><p>${B.note}</p></div>
- <div class="tw"><table><thead><tr><th>المؤشر</th><th class="n">${B.months[0]}</th><th class="n">${B.months[1]}</th><th class="n">أكتوبر 2026</th></tr></thead><tbody>${rows}</tbody></table></div>`;
- document.getElementById("vCompare").innerHTML=`<div class="vh"><h2>قبل وبعد</h2><p>نقطة البداية هي سبتمبر 2026، آخر شهر قبل بدء الخطة. كل شهر تُضاف أرقامه هنا، ويظهر الفرق عن نقطة البداية.</p></div>
- <div class="tiles">${d.kpi.map(k=>`<div class="tile"><span>${k[0]}</span><b>${k[1]}</b><small>سبتمبر 2026 · نقطة البداية</small></div>`).join("")}</div>
+ <ul><li>أرقام المنصات من 11 أكتوبر، بداية الخطة</li><li>الاستفسارات الواردة من كل منصة عبر روابط الواتساب</li><li>أداء كل محتوى منشور، وأفضل 3 محتويات</li><li>خطة نوفمبر مبنية على النتائج</li></ul></div>`;
+ document.getElementById("vCompare").innerHTML=`<div class="vh"><h2>قبل وبعد</h2><p>نقطة البداية هي أرقام الحسابات يوم 11 أكتوبر 2026، أول يوم في الخطة. كل شهر تُضاف أرقامه هنا، ويظهر الفرق عن نقطة البداية.</p></div>
+ <div class="panel"><div class="arch"><h3>نقطة البداية</h3><span class="tag2">تُسجّل 11 أكتوبر</span></div><p class="empty" style="margin:8px 0 0">متابعو كل منصة، ومشاهداتها، ومحادثات الواتساب في أول يوم من الخطة.</p></div>
  <div class="panel"><div class="arch"><h3>أول مقارنة</h3><span class="tag2">1 نوفمبر</span></div><p class="empty" style="margin:8px 0 0">بعد صدور تقرير أكتوبر تظهر هنا نسبة التغير لكل مؤشر، ورسم يتابع النمو شهرًا بشهر.</p></div>`;
  document.getElementById("vArchive").innerHTML=`<div class="vh"><h2>الأرشيف</h2><p>كل خطة تنتهي تنتقل إلى هنا كما هي: محتواها ومعايناتها وتقريرها.</p></div>
  <div class="panel"><div class="arch"><div><h3>خطة 11 أكتوبر – 7 نوفمبر 2026</h3><p class="empty" style="margin:2px 0 0">الخطة الحالية · تنتقل للأرشيف بعد انتهائها</p></div><a href="#plan" class="tag2" style="text-decoration:none">عرض الخطة</a></div></div>`;
 }
-
 function renderMore(d){
  document.getElementById("vUpdates").innerHTML=`<div class="vh"><h2>آخر التحديثات</h2><p>ما أُنجز أسبوعًا بأسبوع.</p></div>
  <div class="tl">${d.updates.map(u=>`<div class="panel"><time>${u.date}</time><h3>${u.title}</h3><ul>${u.items.map(i=>`<li>${i}</li>`).join("")}</ul></div>`).join("")}</div>`;
- const tpl="طلب إعلان\nالمطلوب: \nينتهي في: \nالتفاصيل المعتمدة (السعر، المدة، الشروط): ";
+ const tpl="نموذج طلب\nالمطلوب: \nينتهي في: \nالتفاصيل المعتمدة (السعر، المدة، الشروط): \nمدى الأهمية: عاجل / هام / عادي";
  const rows=d.requests.length?d.requests.map(r=>`<tr><td>${r.date}</td><td>${r.what}</td><td class="n">${r.pri}</td><td class="n">${r.pub}</td><td class="n">${r.st}</td></tr>`).join(""):`<tr><td colspan="5" class="empty" style="text-align:center;padding:18px">لا توجد طلبات حتى الآن</td></tr>`;
- document.getElementById("vRequests").innerHTML=`<div class="vh"><h2>طلبات الإعلانات</h2><p>فضلًا استخدام النموذج التالي للإعلانات الجديدة حتى يتم جدولتها ضمن خطة المحتوى، بما في ذلك موعد النشر وحالة التنفيذ.</p></div>
+ document.getElementById("vRequests").innerHTML=`<div class="vh"><h2>الطلبات</h2><p>فضلًا استخدام النموذج التالي للطلبات الجديدة حتى يتم جدولتها ضمن خطة المحتوى، بما في ذلك موعد النشر وحالة التنفيذ.</p></div>
  <div class="req"><div class="panel" style="margin-top:0"><h3>إرسال طلب</h3><div class="tpl" id="tpl">${tpl.replace(/\n/g,"\n")}</div>
   <div class="btns">${d.reqnum?`<a class="btn p" id="waReq" href="https://wa.me/${d.reqnum}?text=${encodeURIComponent(tpl)}" target="_blank" rel="noopener">إرسال عبر واتساب</a>`:`<span class="btn s" style="opacity:.6">إرسال عبر واتساب (بانتظار الرقم)</span>`}<button class="btn s" id="cpy" type="button">نسخ النموذج</button></div>
   <p class="empty" id="cpyMsg" style="margin:8px 0 0" aria-live="polite"></p></div>
   <div class="panel" style="margin-top:0"><h3>مواعيد النشر</h3><div class="pri">
    <div><b class="st s-بانتظار">عاجل</b><span>خلال 24 ساعة، والعاجل جدًا في القصص فورًا</span></div>
-   <div><b class="st s-جاهز">مهم</b><span>أقرب يوم متاح في نفس الأسبوع</span></div>
-   <div><b class="st s-مخطط">عادي</b><span>قصص سناب، أو الأسبوع التالي</span></div></div>
-   <p class="empty" style="margin:12px 0 0">إعلان مباشر واحد أسبوعيًا في المنشورات، واثنان في مواسم التسجيل.</p></div></div>
+   <div><b class="st s-جاهز">هام</b><span>أقرب يوم متاح في نفس الأسبوع</span></div>
+   <div><b class="st s-مخطط">عادي</b><span>قصص سناب، أو الأسبوع التالي</span></div></div></div></div>
  <div class="tw"><table><thead><tr><th>التاريخ</th><th>الطلب</th><th class="n">الأولوية</th><th class="n">موعد النشر</th><th class="n">الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
  document.getElementById("cpy").addEventListener("click",async()=>{const m=document.getElementById("cpyMsg");
   try{await navigator.clipboard.writeText(tpl);m.textContent="تم نسخ النموذج"}catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById("tpl"));const s=getSelection();s.removeAllRanges();s.addRange(r);m.textContent="النموذج محدد، انسخيه يدويًا"}});
