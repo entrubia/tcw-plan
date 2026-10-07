@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>خطة محتوى التميز الكندي</title>
+<title>الإعلام الرقمي · التميز الكندي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap">
 <style>
@@ -131,12 +131,12 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 <body>
 <div class="gate" id="gate"><div class="gbox">
  <img src="logo.png" alt="شعار المعهد">
- <div><h1>خطة المحتوى</h1><p>معهد التميز الكندي العالي</p></div>
+ <div><h1>الإعلام الرقمي</h1><p>معهد التميز الكندي العالي</p></div>
  <form id="gf"><label for="pw">كلمة المرور</label><input id="pw" type="password" autocomplete="current-password" required><div class="err" id="err" role="alert"></div><button id="gb" type="submit">دخول</button></form>
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="369d09b5ce292101e08a808c5de293f7",ITER=310000;
+const SALT="53bd5e4bf565daaea895b0f238701b22",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
