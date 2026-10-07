@@ -66,7 +66,7 @@ section.week{margin-top:30px}
 .s-جاهز{background:var(--ok);color:var(--ok-ink)}.s-مخطط{background:var(--plan);color:var(--plan-ink)}.s-بانتظار{background:var(--wait);color:var(--wait-ink)}
 .note{font-size:12px;color:var(--muted)}
 .extra .grid{grid-template-columns:repeat(auto-fill,minmax(160px,200px))}
-footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}footer .pn{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;margin-bottom:16px}footer .sig{text-align:center;font-weight:400;padding:8px 0 4px}footer .sig b{font-weight:700;color:var(--ink,inherit)}
 .lb{position:fixed;inset:0;background:var(--shade);display:grid;place-items:center;padding:20px;padding-top:calc(20px + env(safe-area-inset-top,0px));z-index:10}
 .lb .box{position:relative;max-width:min(92vw,520px);width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
 .lb video,.lb img{max-height:78vh;max-width:100%;border-radius:12px;background:#000;display:block}
@@ -136,7 +136,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="dc260c9614bb4d5fb226d76ea4e997c6",ITER=310000;
+const SALT="f4c2ef39fb4be62b67cdc964218faed5",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -167,7 +167,7 @@ function render(f){const start=new Date("2026-10-11T00:00:00");let h="";
   if(!list.length)continue;
   h+=`<section class="week"><div class="wh"><h2>الأسبوع ${w+1}</h2><span>${s.getDate()}/${s.getMonth()+1} – ${e.getDate()}/${e.getMonth()+1}</span></div><div class="grid">${list.map(([x,i])=>card(x,i)).join("")}</div></section>`}
  document.getElementById("weeks").innerHTML=h;fill()}
-function boot(data){document.getElementById("app").innerHTML=data.shell;lb=document.getElementById("lb");lbc=document.getElementById("lbc");nav=document.getElementById("lbnav");cnt=document.getElementById("cnt");
+function boot(data){if(location.hash&&location.hash!=="#plan")history.replaceState(null,"",location.pathname+location.search);document.getElementById("app").innerHTML=data.shell;lb=document.getElementById("lb");lbc=document.getElementById("lbc");nav=document.getElementById("lbnav");cnt=document.getElementById("cnt");
 document.addEventListener("click",e=>{const b=e.target.closest(".media");if(b){openM(b.dataset.x!==undefined?EXTRA[+b.dataset.x].m:ITEMS[+b.dataset.i].m);return}if(e.target===lb)closeL()});
 document.getElementById("lbx").addEventListener("click",closeL);
 document.getElementById("prev").addEventListener("click",()=>{si=(si-1+slides.length)%slides.length;showSlide()});
@@ -228,7 +228,7 @@ function renderMore(d){
 
 const TABS=["plan","updates","requests","reports","compare","rivals","archive"];
 function route(){const t=(location.hash||"#plan").slice(1);const cur=TABS.includes(t)?t:"plan";
- document.querySelectorAll("[data-view]").forEach(v=>v.hidden=v.dataset.view!==cur);const ft=document.querySelector("#app footer");if(ft)ft.hidden=cur!=="plan";
+ document.querySelectorAll("[data-view]").forEach(v=>v.hidden=v.dataset.view!==cur);const ft=document.querySelector("#app footer .pn");if(ft)ft.hidden=cur!=="plan";
  document.querySelectorAll(".tabs a").forEach(a=>a.toggleAttribute("aria-current",a.dataset.tab===cur)&&a.setAttribute("aria-current","page"));
  document.querySelectorAll(".tabs a").forEach(a=>{if(a.dataset.tab===cur)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});}
 window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0)});
