@@ -136,7 +136,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="f4c2ef39fb4be62b67cdc964218faed5",ITER=310000;
+const SALT="63ab5beb283732fb86008e87fc1c3758",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -228,7 +228,7 @@ function renderMore(d){
 
 const TABS=["plan","updates","requests","reports","compare","rivals","archive"];
 function route(){const t=(location.hash||"#plan").slice(1);const cur=TABS.includes(t)?t:"plan";
- document.querySelectorAll("[data-view]").forEach(v=>v.hidden=v.dataset.view!==cur);const ft=document.querySelector("#app footer .pn");if(ft)ft.hidden=cur!=="plan";
+ document.querySelectorAll("[data-view]").forEach(v=>v.hidden=v.dataset.view!==cur);
  document.querySelectorAll(".tabs a").forEach(a=>a.toggleAttribute("aria-current",a.dataset.tab===cur)&&a.setAttribute("aria-current","page"));
  document.querySelectorAll(".tabs a").forEach(a=>{if(a.dataset.tab===cur)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});}
 window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0)});
