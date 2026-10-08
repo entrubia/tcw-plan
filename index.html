@@ -58,13 +58,15 @@ section.week{margin-top:30px}
 .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
 .meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
 .chip{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px}
-.k-فيديو{background:var(--chip-video);color:var(--chip-video-ink)}.k-قوقل{background:var(--chip-g);color:var(--chip-g-ink)}.k-كاروسيل{background:var(--chip-car);color:var(--chip-car-ink)}
+.k-فيديو{background:var(--chip-video);color:var(--chip-video-ink)}.k-ستوري{background:var(--ok);color:var(--ok-ink)}
+.k-قوقل{background:var(--chip-g);color:var(--chip-g-ink)}.k-كاروسيل{background:var(--chip-car);color:var(--chip-car-ink)}
 .topic{font-weight:800;font-size:15.5px;line-height:1.4;text-wrap:balance}
 .hook{font-size:13px;color:var(--muted);line-height:1.5}
 .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:6px;font-size:12px;color:var(--muted)}
 .st{font-weight:700;font-size:11.5px;padding:2px 9px;border-radius:6px;white-space:nowrap}
 .s-جاهز{background:var(--ok);color:var(--ok-ink)}.s-مخطط{background:var(--plan);color:var(--plan-ink)}.s-بانتظار{background:var(--wait);color:var(--wait-ink)}
-.s-منشور{background:var(--chip-video);color:var(--chip-video-ink)}
+.s-منشور{background:var(--ink);color:var(--bg)}.s-مجدول{background:var(--chip-car);color:var(--chip-car-ink)}
+.sch{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--chip-car-ink);background:var(--chip-car);border-radius:8px;padding:6px 10px}
 .perf{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px}
 .perf div{background:var(--sunk);border-radius:8px;padding:6px 4px;text-align:center}
 .perf b{display:block;font-weight:800;font-size:15px;line-height:1.2;font-variant-numeric:tabular-nums}
@@ -145,7 +147,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="5097d4c03bce1b4aae33918a89ee330b",ITER=310000;
+const SALT="822d23b8b4262d525c7ed3e1b32f6d58",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -165,18 +167,19 @@ function mediaHTML(it,i){const m=it.m;
  return `<button class="media ${m.fit==="contain"?"contain":""}" data-i="${i}" aria-label="عرض التصميم: ${it.topic}">${im}</button>`}
 
 let TOP=new Set();
+const eff=it=>it.st==='مجدول'&&it.at&&Date.now()>=Date.parse(it.at)?'منشور':it.st;
 function perfHTML(it){const p=it.perf;if(p)return `<div class="perf"><div><b>${fmt(p.views)}</b><span>مشاهدة</span></div><div><b>${fmt(p.eng)}</b><span>تفاعل</span></div><div><b>${fmt(p.inq)}</b><span>استفسار</span></div></div>`;
- return it.st==="منشور"?`<div class="perf wait">الأرقام تُضاف بعد 48 ساعة من النشر</div>`:""}
+ return it.st==="منشور"&&!it.sch?`<div class="perf wait">الأرقام تُضاف بعد 48 ساعة من النشر</div>`:""}
 function card(it,i){return `<article class="card">${TOP.has(i)?`<span class="top">الأعلى أداءً</span>`:""}${mediaHTML(it,i)}<div class="body">
  <div class="meta"><span>${it.day} ${it.date}</span><span class="chip k-${it.kind}">${it.kind}</span></div>
  <div class="topic">${it.topic}</div><div class="hook">${it.hook}</div>
  ${it.m&&it.m.note?`<div class="note">${it.m.note}</div>`:""}
- ${perfHTML(it)}<div class="foot"><span>${it.plat}</span><span class="st ${stClass(it.st)}">${it.st}</span></div></div></article>`}
+ ${it.sch&&it.st==="مجدول"?(eff(it)==="منشور"?(it.perf?"":`<div class="sch">✓ نُشر · الأرقام قريبًا</div>`):`<div class="sch">🗓 ${it.sch}</div>`):""}${perfHTML(it)}<div class="foot"><span>${it.plat}</span><span class="st ${stClass(eff(it))}">${eff(it)}</span></div></div></article>`}
 const IDX={};
 function fill(){document.querySelectorAll("img[data-k]").forEach(async im=>{try{im.src=await url(IDX[im.dataset.k]);im.classList.remove("loading")}catch(e){}})}
 function render(f){const start=new Date("2026-10-11T00:00:00");let h="";
  for(let w=0;w<4;w++){const s=new Date(start);s.setDate(s.getDate()+7*w);const e=new Date(s);e.setDate(e.getDate()+6);
-  const list=ITEMS.map((x,i)=>[x,i]).filter(([x])=>{const d=new Date(x.iso+"T00:00:00");return d>=s&&d<=e}).filter(([x])=>f==="all"||(f==="جاهز"?x.st==="جاهز":x.st!=="جاهز"));
+  const list=ITEMS.map((x,i)=>[x,i]).filter(([x])=>{const d=new Date(x.iso+"T00:00:00");return d>=s&&d<=e}).filter(([x])=>f==="all"||(f==="جاهز"?eff(x)==="جاهز":f==="مجدول"?(eff(x)==="مجدول"||eff(x)==="منشور"):!["جاهز","مجدول","منشور"].includes(eff(x))));
   if(!list.length)continue;
   h+=`<section class="week"><div class="wh"><h2>الأسبوع ${w+1}</h2><span>${s.getDate()}/${s.getMonth()+1} – ${e.getDate()}/${e.getMonth()+1}</span></div><div class="grid">${list.map(([x,i])=>card(x,i)).join("")}</div></section>`}
  document.getElementById("weeks").innerHTML=h;fill()}
@@ -190,7 +193,7 @@ document.addEventListener("keydown",e=>{if(lb.hidden)return;if(e.key==="Escape")
 ITEMS=data.items;EXTRA=data.extra;
  const reg=m=>{if(!m)return;[].concat(m.src,m.poster||[]).forEach(x=>{if(x&&x.id)IDX[x.id]=x})};ITEMS.forEach(x=>reg(x.m));EXTRA.forEach(x=>reg(x.m));
  const ready=ITEMS.filter(x=>x.st==="جاهز").length;
- document.getElementById("prog").innerHTML=`<b>${ready}</b> من ${ITEMS.length} بندًا جاهز للمعاينة`;
+ const stc=s=>ITEMS.filter(x=>eff(x)===s).length;document.getElementById("prog").innerHTML=`<b>${stc("منشور")}</b> منشور · <b>${stc("مجدول")}</b> مجدول · <b>${ready}</b> جاهز · من ${ITEMS.length} بندًا`;
  document.getElementById("extraGrid").innerHTML=EXTRA.map((x,i)=>`<article class="card"><button class="media" data-x="${i}" aria-label="عرض القالب: ${x.topic}"><img data-k="${x.m.src.id}" alt="" class="loading"></button><div class="body"><div class="topic">${x.topic}</div></div></article>`).join("");
  const ranked=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.perf).sort((A,B)=>(B[0].perf.inq-A[0].perf.inq)||(B[0].perf.views-A[0].perf.views));
  TOP=new Set(ranked.slice(0,3).map(([,i])=>i));window.RANKED=ranked;
