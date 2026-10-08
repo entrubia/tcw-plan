@@ -64,6 +64,15 @@ section.week{margin-top:30px}
 .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:6px;font-size:12px;color:var(--muted)}
 .st{font-weight:700;font-size:11.5px;padding:2px 9px;border-radius:6px;white-space:nowrap}
 .s-جاهز{background:var(--ok);color:var(--ok-ink)}.s-مخطط{background:var(--plan);color:var(--plan-ink)}.s-بانتظار{background:var(--wait);color:var(--wait-ink)}
+.s-منشور{background:var(--chip-video);color:var(--chip-video-ink)}
+.perf{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px}
+.perf div{background:var(--sunk);border-radius:8px;padding:6px 4px;text-align:center}
+.perf b{display:block;font-weight:800;font-size:15px;line-height:1.2;font-variant-numeric:tabular-nums}
+.perf span{display:block;font-size:11px;color:var(--muted)}
+.perf.wait{display:block;background:var(--sunk);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--muted);text-align:center}
+.top{position:absolute;top:10px;inset-inline-end:10px;background:var(--ink);color:var(--bg);font-weight:700;font-size:11px;padding:4px 10px;border-radius:999px;z-index:1}
+.card{position:relative}
+.rank td:first-child{font-weight:800;color:var(--muted);width:28px}
 .note{font-size:12px;color:var(--muted)}
 .extra .grid{grid-template-columns:repeat(auto-fill,minmax(160px,200px))}
 footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}footer .pn{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;margin-bottom:16px}footer .sig{text-align:center;font-weight:400;padding:8px 0 4px}footer .sig b{font-weight:700;color:var(--ink,inherit)}
@@ -136,7 +145,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="53bd5e4bf565daaea895b0f238701b22",ITER=310000;
+const SALT="4fa18bf851f298d3154ae51f529b998f",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -154,11 +163,15 @@ function mediaHTML(it,i){const m=it.m;
  if(m.t==="video") return `<button class="media" data-i="${i}" aria-label="تشغيل الفيديو: ${it.topic}">${im}${play}<span class="badge">فيديو</span></button>`;
  if(m.t==="car") return `<button class="media" data-i="${i}" aria-label="عرض الكاروسيل: ${it.topic}">${im}<span class="badge">${m.src.length} شرائح</span></button>`;
  return `<button class="media ${m.fit==="contain"?"contain":""}" data-i="${i}" aria-label="عرض التصميم: ${it.topic}">${im}</button>`}
-function card(it,i){return `<article class="card">${mediaHTML(it,i)}<div class="body">
+
+let TOP=new Set();
+function perfHTML(it){const p=it.perf;if(p)return `<div class="perf"><div><b>${fmt(p.views)}</b><span>مشاهدة</span></div><div><b>${fmt(p.eng)}</b><span>تفاعل</span></div><div><b>${fmt(p.inq)}</b><span>استفسار</span></div></div>`;
+ return it.st==="منشور"?`<div class="perf wait">الأرقام تُضاف بعد 48 ساعة من النشر</div>`:""}
+function card(it,i){return `<article class="card">${TOP.has(i)?`<span class="top">الأعلى أداءً</span>`:""}${mediaHTML(it,i)}<div class="body">
  <div class="meta"><span>${it.day} ${it.date}</span><span class="chip k-${it.kind}">${it.kind}</span></div>
  <div class="topic">${it.topic}</div><div class="hook">${it.hook}</div>
  ${it.m&&it.m.note?`<div class="note">${it.m.note}</div>`:""}
- <div class="foot"><span>${it.plat}</span><span class="st ${stClass(it.st)}">${it.st}</span></div></div></article>`}
+ ${perfHTML(it)}<div class="foot"><span>${it.plat}</span><span class="st ${stClass(it.st)}">${it.st}</span></div></div></article>`}
 const IDX={};
 function fill(){document.querySelectorAll("img[data-k]").forEach(async im=>{try{im.src=await url(IDX[im.dataset.k]);im.classList.remove("loading")}catch(e){}})}
 function render(f){const start=new Date("2026-10-11T00:00:00");let h="";
@@ -179,6 +192,8 @@ ITEMS=data.items;EXTRA=data.extra;
  const ready=ITEMS.filter(x=>x.st==="جاهز").length;
  document.getElementById("prog").innerHTML=`<b>${ready}</b> من ${ITEMS.length} بندًا جاهز للمعاينة`;
  document.getElementById("extraGrid").innerHTML=EXTRA.map((x,i)=>`<article class="card"><button class="media" data-x="${i}" aria-label="عرض القالب: ${x.topic}"><img data-k="${x.m.src.id}" alt="" class="loading"></button><div class="body"><div class="topic">${x.topic}</div></div></article>`).join("");
+ const ranked=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.perf).sort((A,B)=>(B[0].perf.inq-A[0].perf.inq)||(B[0].perf.views-A[0].perf.views));
+ TOP=new Set(ranked.slice(0,3).map(([,i])=>i));window.RANKED=ranked;
  render("all");
  document.querySelectorAll(".filters button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".filters button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));render(b.dataset.f)}));
  renderViews(data);renderMore(data);route();document.getElementById("gate").hidden=true;document.getElementById("app").hidden=false}
@@ -195,7 +210,9 @@ const fmt=v=>v===null||v===undefined?"—":(typeof v==="number"?v.toLocaleString
 function renderViews(d){
  document.getElementById("vReports").innerHTML=`<div class="vh"><h2>التقارير الشهرية</h2><p>تقرير لكل شهر: أرقام كل منصة مقارنة بالشهر السابق، والاستفسارات حسب المنصة، وأفضل المحتوى وأضعفه، وخطة الشهر التالي.</p></div>
  <div class="panel"><div class="arch"><h3>تقرير أكتوبر 2026</h3><span class="tag2">يصدر 1 نوفمبر</span></div>
- <ul><li>أرقام المنصات من 11 أكتوبر، بداية الخطة</li><li>الاستفسارات الواردة من كل منصة عبر روابط الواتساب</li><li>أداء كل محتوى منشور، وأفضل 3 محتويات</li><li>خطة نوفمبر مبنية على النتائج</li></ul></div>`;
+ <ul><li>أرقام المنصات من 11 أكتوبر، بداية الخطة</li><li>الاستفسارات الواردة من كل منصة عبر روابط الواتساب</li><li>أداء كل محتوى منشور، وأفضل 3 محتويات</li><li>خطة نوفمبر مبنية على النتائج</li></ul></div>`+(()=>{const R=window.RANKED||[];
+ const body=R.length?`<div class="tw"><table class="rank"><thead><tr><th>#</th><th>المحتوى</th><th>المنصة</th><th>التاريخ</th><th>المشاهدات</th><th>التفاعل</th><th>الاستفسارات</th></tr></thead><tbody>${R.map(([x],k)=>`<tr><td>${k+1}</td><td>${x.topic}</td><td>${x.plat}</td><td>${x.date}</td><td>${fmt(x.perf.views)}</td><td>${fmt(x.perf.eng)}</td><td>${fmt(x.perf.inq)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="empty" style="margin:8px 0 0">يُضاف كل محتوى هنا بعد نشره بيومين، مرتبًا حسب الاستفسارات ثم المشاهدات.</p>`;
+ return `<div class="panel"><div class="arch"><h3>أداء المحتوى</h3><span class="tag2">${R.length} منشور</span></div>${body}</div>`})();
  document.getElementById("vCompare").innerHTML=`<div class="vh"><h2>قبل وبعد</h2><p>نقطة البداية هي أرقام الحسابات يوم 11 أكتوبر 2026، أول يوم في الخطة. كل شهر تُضاف أرقامه هنا، ويظهر الفرق عن نقطة البداية.</p></div>
  <div class="panel"><div class="arch"><h3>نقطة البداية</h3><span class="tag2">تُسجّل 11 أكتوبر</span></div><p class="empty" style="margin:8px 0 0">متابعو كل منصة، ومشاهداتها، ومحادثات الواتساب في أول يوم من الخطة.</p></div>
  <div class="panel"><div class="arch"><h3>أول مقارنة</h3><span class="tag2">1 نوفمبر</span></div><p class="empty" style="margin:8px 0 0">بعد صدور تقرير أكتوبر تظهر هنا نسبة التغير لكل مؤشر، ورسم يتابع النمو شهرًا بشهر.</p></div>`;
