@@ -44,6 +44,15 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 .filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .filters button:focus-visible,.card button:focus-visible,.lb button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 section.week{margin-top:30px}
+details.wk>summary{list-style:none;cursor:pointer;padding:12px 4px;border-radius:12px;align-items:center;margin-bottom:0}
+details.wk>summary::-webkit-details-marker{display:none}
+details.wk>summary:hover{background:var(--sunk)}
+details.wk>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details.wk>summary em{font-style:normal;font-size:13px;font-weight:700;color:var(--muted);background:var(--sunk);padding:3px 10px;border-radius:999px}
+details.wk>summary .chev{margin-inline-start:auto;width:10px;height:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-3px) rotate(45deg);transition:transform .2s}
+details.wk[open]>summary .chev{transform:translateY(2px) rotate(225deg)}
+details.wk[open]>summary{margin-bottom:12px}
+details.wk{border-bottom:1px solid var(--line);padding-bottom:4px}
 .wh{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
 .wh h2{margin:0;font-size:20px;font-weight:800}.wh span{color:var(--muted);font-weight:500;font-size:14px;font-variant-numeric:tabular-nums}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
@@ -147,7 +156,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="4d4dfc0e8768899cf0665b7d750933c2",ITER=310000;
+const SALT="6c91125046e6583681d997d5b19ec51e",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -177,12 +186,16 @@ function card(it,i){return `<article class="card">${TOP.has(i)?`<span class="top
  ${it.sch&&it.st==="مجدول"?(eff(it)==="منشور"?(it.perf?"":`<div class="sch">✓ نُشر · الأرقام قريبًا</div>`):`<div class="sch">🗓 ${it.sch}</div>`):""}${perfHTML(it)}<div class="foot"><span>${it.plat}</span><span class="st ${stClass(eff(it))}">${eff(it)}</span></div></div></article>`}
 const IDX={};
 function fill(){document.querySelectorAll("img[data-k]").forEach(async im=>{try{im.src=await url(IDX[im.dataset.k]);im.classList.remove("loading")}catch(e){}})}
-function render(f){const start=new Date("2026-10-11T00:00:00");let h="";
+function render(f){const start=new Date("2026-10-11T00:00:00");let h="",openW=null;
  for(let w=0;w<4;w++){const s=new Date(start);s.setDate(s.getDate()+7*w);const e=new Date(s);e.setDate(e.getDate()+6);
   const list=ITEMS.map((x,i)=>[x,i]).filter(([x])=>{const d=new Date(x.iso+"T00:00:00");return d>=s&&d<=e}).filter(([x])=>f==="all"||(f==="جاهز"?eff(x)==="جاهز":f==="مجدول"?(eff(x)==="مجدول"||eff(x)==="منشور"):!["جاهز","مجدول","منشور"].includes(eff(x))));
   if(!list.length)continue;
-  h+=`<section class="week"><div class="wh"><h2>الأسبوع ${w+1}</h2><span>${s.getDate()}/${s.getMonth()+1} – ${e.getDate()}/${e.getMonth()+1}</span></div><div class="grid">${list.map(([x,i])=>card(x,i)).join("")}</div></section>`}
- document.getElementById("weeks").innerHTML=h;fill()}
+  const now=Date.now(),inW=now>=s.getTime()&&now<e.getTime()+864e5;if(inW)openW=w;
+  const n=k=>list.filter(([x])=>eff(x)===k).length,sm=[["منشور",n("منشور")],["مجدول",n("مجدول")],["جاهز",n("جاهز")]].filter(([,c])=>c).map(([k,c])=>`${c} ${k}`).join(" · ");
+  h+=`<details class="week wk" data-w="${w}"><summary class="wh"><h2>الأسبوع ${w+1}</h2><span>${s.getDate()}/${s.getMonth()+1} – ${e.getDate()}/${e.getMonth()+1}</span><em>${list.length} بنود${sm?" · "+sm:""}</em><i class="chev" aria-hidden="true"></i></summary><div class="grid">${list.map(([x,i])=>card(x,i)).join("")}</div></details>`}
+ document.getElementById("weeks").innerHTML=h;
+ const ds=[...document.querySelectorAll("#weeks details.wk")];if(f!=="all")ds.forEach(d=>d.open=true);else{const t=ds.find(d=>+d.dataset.w===openW)||(Date.now()<start.getTime()?ds[0]:ds[ds.length-1]);if(t)t.open=true}
+ fill()}
 function boot(data){if(location.hash&&location.hash!=="#plan")history.replaceState(null,"",location.pathname+location.search);document.getElementById("app").innerHTML=data.shell;lb=document.getElementById("lb");lbc=document.getElementById("lbc");nav=document.getElementById("lbnav");cnt=document.getElementById("cnt");
 document.addEventListener("click",e=>{const b=e.target.closest(".media");if(b){openM(b.dataset.x!==undefined?EXTRA[+b.dataset.x].m:ITEMS[+b.dataset.i].m);return}if(e.target===lb)closeL()});
 document.getElementById("lbx").addEventListener("click",closeL);
