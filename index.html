@@ -145,7 +145,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="4fa18bf851f298d3154ae51f529b998f",ITER=310000;
+const SALT="5097d4c03bce1b4aae33918a89ee330b",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -230,8 +230,8 @@ function renderMore(d){
   <p class="empty" id="cpyMsg" style="margin:8px 0 0" aria-live="polite"></p></div>
   <div class="panel" style="margin-top:0"><h3>مواعيد النشر</h3><div class="pri">
    <div><b class="st s-بانتظار">عاجل</b><span>خلال 24 ساعة، والعاجل جدًا في القصص فورًا</span></div>
-   <div><b class="st s-جاهز">هام</b><span>أقرب يوم متاح في نفس الأسبوع</span></div>
-   <div><b class="st s-مخطط">عادي</b><span>قصص سناب، أو الأسبوع التالي</span></div></div></div></div>
+   <div><b class="st s-جاهز">هام</b><span>خلال يومين</span></div>
+   <div><b class="st s-مخطط">عادي</b><span>ضمن خطة الأسبوع التالي</span></div></div></div></div>
  <div class="tw"><table><thead><tr><th>التاريخ</th><th>الطلب</th><th class="n">الأولوية</th><th class="n">موعد النشر</th><th class="n">الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
  document.getElementById("cpy").addEventListener("click",async()=>{const m=document.getElementById("cpyMsg");
   try{await navigator.clipboard.writeText(tpl);m.textContent="تم نسخ النموذج"}catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById("tpl"));const s=getSelection();s.removeAllRanges();s.addRange(r);m.textContent="النموذج محدد، انسخيه يدويًا"}});
