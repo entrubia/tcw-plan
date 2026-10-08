@@ -92,7 +92,7 @@ footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);color:v
 .lb video,.lb img{max-height:78vh;max-width:100%;border-radius:12px;background:#000;display:block}
 .lb .row{display:flex;gap:10px;align-items:center;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
 .lb button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:8px 16px;background:#fff;color:#222;cursor:pointer}
-.lb .x{position:absolute;top:-6px;inset-inline-end:-6px;width:40px;height:40px;padding:0;font-size:20px;line-height:1}
+.lb .x{position:absolute;z-index:2;top:-6px;inset-inline-end:-6px;width:40px;height:40px;padding:0;font-size:20px;line-height:1}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:no-preference){.card{transition:transform .2s}.card:hover{transform:translateY(-2px)}}
 
@@ -191,7 +191,7 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 </div></div>
 <div id="app" hidden></div>
 <script>
-const SALT="a0b25f1b363868a90961709695ad5c80",ITER=310000;
+const SALT="c54c5c845560363a0b783ea20260ad7e",ITER=310000;
 const hex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
 let KEY=null; const cache={};
 async function derive(pw){const b=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -232,8 +232,8 @@ function render(f){const start=new Date("2026-10-11T00:00:00");let h="",openW=nu
  const ds=[...document.querySelectorAll("#weeks details.wk")];if(f!=="all")ds.forEach(d=>d.open=true);else{const t=ds.find(d=>+d.dataset.w===openW)||(Date.now()<start.getTime()?ds[0]:ds[ds.length-1]);if(t)t.open=true}
  fill()}
 function boot(data){if(location.hash)history.replaceState(null,"",location.pathname+location.search);document.getElementById("app").innerHTML=data.shell;lb=document.getElementById("lb");lbc=document.getElementById("lbc");nav=document.getElementById("lbnav");cnt=document.getElementById("cnt");
-document.addEventListener("click",e=>{const b=e.target.closest(".media");if(b){openM(b.dataset.x!==undefined?EXTRA[+b.dataset.x].m:ITEMS[+b.dataset.i].m);return}if(e.target===lb)closeL()});
-document.getElementById("lbx").addEventListener("click",closeL);
+document.addEventListener("click",e=>{const b=e.target.closest(".media");if(b){const it=b.dataset.x!==undefined?EXTRA[+b.dataset.x]:ITEMS[+b.dataset.i];openM(it.m,fname(it));return}if(e.target===lb)closeL()});
+document.getElementById("lbx").addEventListener("click",closeL);document.getElementById("dl").addEventListener("click",doDl);
 document.getElementById("prev").addEventListener("click",()=>{si=(si-1+slides.length)%slides.length;showSlide()});
 document.getElementById("next").addEventListener("click",()=>{si=(si+1)%slides.length;showSlide()});
 document.addEventListener("keydown",e=>{if(lb.hidden)return;if(e.key==="Escape")closeL();if(!nav.hidden){if(e.key==="ArrowLeft")document.getElementById("next").click();if(e.key==="ArrowRight")document.getElementById("prev").click()}});
@@ -250,11 +250,17 @@ ITEMS=data.items;EXTRA=data.extra;
  renderViews(data);renderMore(data);renderCover(data);route();document.getElementById("gate").hidden=true;document.getElementById("app").hidden=false}
 let lb,lbc,nav,cnt;
 let slides=[],si=0;
-async function showSlide(){cnt.textContent=`${si+1} / ${slides.length}`;lbc.innerHTML=`<img src="${await url(slides[si])}" alt="شريحة ${si+1}">`}
-async function openM(m){nav.hidden=true;lb.hidden=false;lbc.innerHTML='<p style="color:#fff;font-weight:700">جاري التحميل…</p>';document.getElementById("lbx").focus();
- if(m.t==="video")lbc.innerHTML=`<video src="${await url(m.src)}" poster="${await url(m.poster)}" controls playsinline></video>`;
+async function showSlide(){cnt.textContent=`${si+1} / ${slides.length}`;lbc.innerHTML=`<img src="${await url(slides[si])}" alt="شريحة ${si+1}">`;prepDl(slides[si],dlName+"_"+(si+1))}
+let dlName="TCW",dlFile=null,dlU="";
+function fname(it){return ["TCW",(it.iso||"").trim(),(it.typ||it.topic||"").replace(/[\\/:*?"<>|]/g,"").replace(/\s+/g,"_").slice(0,40)].filter(Boolean).join("_")}
+const EXT={"video/mp4":".mp4","image/jpeg":".jpg","image/png":".png"};
+async function prepDl(m,n){const b=document.getElementById("dl");b.hidden=true;dlFile=null;dlU=await url(m);const fn=n+(EXT[m.type]||"");try{const bl=await (await fetch(dlU)).blob();dlFile=new File([bl],fn,{type:m.type})}catch(e){}b.dataset.fn=fn;b.hidden=false}
+function doDl(){const b=document.getElementById("dl");if(dlFile&&matchMedia("(pointer:coarse)").matches&&navigator.canShare&&navigator.canShare({files:[dlFile]})){navigator.share({files:[dlFile]}).catch(e=>{if(e.name!=="AbortError")saveA(b.dataset.fn)});return}saveA(b.dataset.fn)}
+function saveA(fn){const a=document.createElement("a");a.href=dlU;a.download=fn;document.body.appendChild(a);a.click();a.remove()}
+async function openM(m,name){dlName=name||"TCW";document.getElementById("dl").hidden=true;nav.hidden=true;lb.hidden=false;lbc.innerHTML='<p style="color:#fff;font-weight:700">جاري التحميل…</p>';document.getElementById("lbx").focus();
+ if(m.t==="video"){lbc.innerHTML=`<video src="${await url(m.src)}" poster="${await url(m.poster)}" controls playsinline></video>`;prepDl(m.src,dlName)}
  else if(m.t==="car"){slides=m.src;si=0;nav.hidden=false;await showSlide()}
- else lbc.innerHTML=`<img src="${await url(m.src)}" alt="">`}
+ else{lbc.innerHTML=`<img src="${await url(m.src)}" alt="">`;prepDl(m.src,dlName)}}
 function closeL(){lb.hidden=true;lbc.innerHTML=""}
 
 const fmt=v=>v===null||v===undefined?"—":(typeof v==="number"?v.toLocaleString("en-US"):v);
@@ -300,7 +306,7 @@ async function renderCover(d){const ci=d.cvimg;
  const C=d.cover||{},n=d.items.length;
  const S=[{v:n,l:"محتوى في الخطة الحالية"},{v:C.growth??null,l:"نمو المتابعين",suf:"%"},{v:C.inquiries??null,l:"استفسارات من المنصات"}];
  const box=document.getElementById("cvS");const hasData=C.growth!=null||C.inquiries!=null;if(!hasData){box.remove()}if(hasData)box.innerHTML=S.map(s=>`<div><b data-v="${s.v??""}" data-s="${s.suf||""}">${s.v==null?"—":"0"}</b><span>${s.l}</span></div>`).join("")+(S.some(s=>s.v==null)?`<p class="cv-note">${C.note||"تبدأ القراءة من 11 أكتوبر، وتُحدّث الأرقام شهريًا."}</p>`:"");
- const G=d.guides||[];document.getElementById("cvG").innerHTML=G.map(g=>g.u?`<a href="${g.u}" target="_blank" rel="noopener">${g.t}<i>فتح ↗</i></a>`:`<span class="g0">${g.t}<i>قريبًا</i></span>`).join("");
+ const G=d.guides||[];document.getElementById("cvG").innerHTML=G.map(g=>g.u?`<a href="${g.u}" target="_blank" rel="noopener">${g.t}<i>فتح</i></a>`:`<span class="g0">${g.t}<i>قريبًا</i></span>`).join("");
  const cv=document.querySelector(".cover");let seen=false;try{seen=sessionStorage.getItem("tcw-cv")==="1";sessionStorage.setItem("tcw-cv","1")}catch(e){}
  const still=seen||matchMedia("(prefers-reduced-motion:reduce)").matches;
  const fin=()=>hasData&&box.querySelectorAll("b[data-v]").forEach(b=>{if(b.dataset.v!=="")b.textContent=Number(b.dataset.v).toLocaleString("en-US")+b.dataset.s});
