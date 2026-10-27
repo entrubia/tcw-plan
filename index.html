@@ -281,14 +281,14 @@ function renderViews(d){
  document.getElementById("vArchive").innerHTML=`<div class="vh"><h2>الأرشيف</h2><p>كل خطة تنتهي تنتقل إلى هنا كما هي: محتواها ومعايناتها وتقريرها.</p></div>
  <div class="panel"><div class="arch"><div><h3>خطة 11 أكتوبر – 7 نوفمبر 2026</h3><p class="empty" style="margin:2px 0 0">الخطة الحالية · تنتقل للأرشيف بعد انتهائها</p></div><a href="#plan" class="tag2" style="text-decoration:none">عرض الخطة</a></div></div>`;
 }
-function renderStories(){const C=[["الكل","all"],["الدورات","دورات"],["الدبلومات","دبلومات"],["الورش","ورش"],["العروض","عروض"],["التواصل والخدمات","تواصل"]];
+function renderStories(){const C=[["الكل","all"],["الدورات","دورات"],["الدبلومات","دبلومات"],["الورش","ورش"],["العروض","عروض"],["التواصل والخدمات","تواصل"],["منتهي","exp"]];
  const ex=g=>g.exp&&Date.now()>=Date.parse(g.exp);
  const order=STORIES.map((g,i)=>[g,i]).sort((A,B)=>(ex(A[0])-ex(B[0]))||B[0].iso.localeCompare(A[0].iso));
  const v=document.getElementById("vStories");
  v.innerHTML=`<div class="vh"><h2>الستوريات</h2><p>الستوريات الثابتة المصممة لطلبات الإدارة. ستوريات الطلب الواحد مجموعة في بطاقة واحدة، و«منتهي» تعني أن العرض أو الورشة انتهت فلا يُعاد نشرها.</p></div>
- <div class="filters stf" role="group" aria-label="تصفية حسب النوع">${C.map(([l,k],j)=>`<button aria-pressed="${j?"false":"true"}" data-c="${k}">${l} <span>${k==="all"?STORIES.length:STORIES.filter(g=>g.cat===k).length}</span></button>`).join("")}</div>
- <div class="grid sty" id="stGrid">${order.map(([g,i])=>{const n=g.items.length,x=ex(g);return `<article class="card${x?" exp":""}" data-cat="${g.cat}"><button class="media st" data-s="${i}" aria-label="عرض: ${g.title}"><img data-k="${(g.m.t==="car"?g.m.src[0]:g.m.src).id}" alt="" class="loading">${n>1?`<span class="badge">${n} ستوريات</span>`:""}</button><div class="body"><div class="topic">${g.title}</div><div class="foot"><span>${g.date}</span><span class="st ${x?"s-منتهي":"s-صالح"}">${x?"منتهي":"صالح"}</span></div></div></article>`}).join("")}</div>`;
- v.querySelectorAll(".stf button").forEach(b=>b.addEventListener("click",()=>{v.querySelectorAll(".stf button").forEach(y=>y.setAttribute("aria-pressed",y===b?"true":"false"));const c=b.dataset.c;v.querySelectorAll("#stGrid .card").forEach(cd=>cd.hidden=c!=="all"&&cd.dataset.cat!==c)}));
+ <div class="filters stf" role="group" aria-label="تصفية حسب النوع">${C.map(([l,k],j)=>`<button aria-pressed="${j?"false":"true"}" data-c="${k}">${l} <span>${k==="all"?STORIES.length:k==="exp"?STORIES.filter(ex).length:STORIES.filter(g=>g.cat===k).length}</span></button>`).join("")}</div>
+ <div class="grid sty" id="stGrid">${order.map(([g,i])=>{const n=g.items.length,x=ex(g);return `<article class="card${x?" exp":""}" data-cat="${g.cat}" data-x="${x?1:0}"><button class="media st" data-s="${i}" aria-label="عرض: ${g.title}"><img data-k="${(g.m.t==="car"?g.m.src[0]:g.m.src).id}" alt="" class="loading">${n>1?`<span class="badge">${n} ستوريات</span>`:""}</button><div class="body"><div class="topic">${g.title}</div><div class="foot"><span>${g.date}</span><span class="st ${x?"s-منتهي":"s-صالح"}">${x?"منتهي":"صالح"}</span></div></div></article>`}).join("")}</div>`;
+ v.querySelectorAll(".stf button").forEach(b=>b.addEventListener("click",()=>{v.querySelectorAll(".stf button").forEach(y=>y.setAttribute("aria-pressed",y===b?"true":"false"));const c=b.dataset.c;v.querySelectorAll("#stGrid .card").forEach(cd=>cd.hidden=c==="exp"?cd.dataset.x!=="1":(c!=="all"&&cd.dataset.cat!==c))}));
  fill()}
 function renderMore(d){
  document.getElementById("vUpdates").innerHTML=`<div class="vh"><h2>آخر التحديثات</h2><p>ما أُنجز أسبوعًا بأسبوع.</p></div>
