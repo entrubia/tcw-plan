@@ -190,6 +190,9 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 .pri div{display:flex;gap:10px;align-items:baseline;font-size:14px}
 .pri b{flex:none;width:52px;font-size:12.5px;padding:2px 0;border-radius:6px;text-align:center}
 .self td{font-weight:800;background:var(--ok)}
+
+th+th,td+td{border-inline-start:1px solid var(--line)}
+@media (max-width:560px){#weeks .grid,.archw .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#weeks .media,#weeks .ph,.archw .media,.archw .ph{aspect-ratio:9/16}#weeks .topic,.archw .topic{font-size:14px}#weeks .hook,.archw .hook,#weeks .note,.archw .note{display:none}#weeks .foot>span:first-child,.archw .foot>span:first-child{display:none}#weeks .foot,.archw .foot{justify-content:flex-end}#weeks .body,.archw .body{padding:10px 12px 12px}#weeks .perf b,.archw .perf b{font-size:13px}#weeks .perf span,.archw .perf span{font-size:10px}#weeks .sch,.archw .sch{font-size:11px}#weeks .meta,.archw .meta{font-size:11.5px}}
 </style>
 </head>
 <body>
