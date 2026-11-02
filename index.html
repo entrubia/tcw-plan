@@ -193,6 +193,8 @@ tr.g td{background:var(--sunk);font-weight:800;font-size:13px}
 
 th+th,td+td{border-inline-start:1px solid var(--line)}
 @media (max-width:560px){#weeks .grid,.archw .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#weeks .media,#weeks .ph,.archw .media,.archw .ph{aspect-ratio:9/16}#weeks .topic,.archw .topic{font-size:14px}#weeks .hook,.archw .hook,#weeks .note,.archw .note{display:none}#weeks .foot>span:first-child,.archw .foot>span:first-child{display:none}#weeks .foot,.archw .foot{justify-content:flex-end}#weeks .body,.archw .body{padding:10px 12px 12px}#weeks .perf b,.archw .perf b{font-size:13px}#weeks .perf span,.archw .perf span{font-size:10px}#weeks .sch,.archw .sch{font-size:11px}#weeks .meta,.archw .meta{font-size:11.5px}}
+@media (max-width:560px){.extra .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.extra .media{aspect-ratio:9/16}.extra .topic{font-size:14px}.extra .body{padding:10px 12px 12px}}
+.rq{margin-top:18px}.rq .tw{margin-top:4px;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -314,7 +316,9 @@ function renderMore(d){
    <div><b class="st s-بانتظار">عاجل</b><span>خلال 24 ساعة، والعاجل جدًا في القصص فورًا</span></div>
    <div><b class="st s-جاهز">هام</b><span>خلال يومين</span></div>
    <div><b class="st s-مخطط">عادي</b><span>ضمن خطة الأسبوع التالي</span></div></div></div></div>
- <div class="tw"><table><thead><tr><th>التاريخ</th><th>الطلب</th><th class="n">الأولوية</th><th class="n">موعد النشر</th><th class="n">الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+ ${(()=>{const MN=["","يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];const cm=new Date().getMonth()+1;const G={};d.requests.forEach(r=>{const m=+r.date.split("/")[1];(G[m]=G[m]||[]).push(r)});if(!G[cm])G[cm]=[];const ks=Object.keys(G).map(Number).sort((a,b)=>b-a);
+ return ks.map(m=>{const L=G[m];const rw=L.length?L.map(r=>`<tr><td>${r.date}</td><td>${r.what}</td><td class="n">${r.pri}</td><td class="n">${r.pub}</td><td class="n">${r.st}</td></tr>`).join(""):`<tr><td colspan="5" class="empty" style="text-align:center;padding:18px">لا توجد طلبات في ${MN[m]} حتى الآن</td></tr>`;
+ return `<details class="week wk rq"${m===cm?" open":""}><summary class="wh"><h2>طلبات ${MN[m]}</h2><em>${L.length} طلبًا</em><i class="chev" aria-hidden="true"></i></summary>${L.length?`<div class="tw"><table><thead><tr><th>التاريخ</th><th>الطلب</th><th class="n">الأولوية</th><th class="n">موعد النشر</th><th class="n">الحالة</th></tr></thead><tbody>${rw}</tbody></table></div>`:`<p class="empty" style="margin:0 0 14px">لا توجد طلبات في ${MN[m]} حتى الآن.</p>`}</details>`}).join("")})()}`;
  document.getElementById("cpy").addEventListener("click",async()=>{const m=document.getElementById("cpyMsg");
   try{await navigator.clipboard.writeText(tpl);m.textContent="تم نسخ النموذج"}catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById("tpl"));const s=getSelection();s.removeAllRanges();s.addRange(r);m.textContent="النموذج محدد، انسخيه يدويًا"}});
  const C=d.competitors;
