@@ -319,7 +319,7 @@ function renderMore(d){
  document.getElementById("vRivals").innerHTML=`<div class="vh"><h2>المنافسون</h2><p>أرقام الحسابات العامة لمعاهد مشابهة، تُحدّث أول كل شهر. الهدف معرفة سرعة نمونا مقارنة بالسوق.</p></div>
  <div class="tw"><table class="rv"><thead><tr><th>المعهد</th><th class="n">انستقرام</th><th class="n">تيك توك</th><th class="n">سناب</th><th class="n">إكس</th></tr></thead><tbody>${cr}
  </tbody></table></div>
- <p class="empty" style="margin:8px 0 0">عدد المتابعين · ${C.date||C.month} · (—) لم يُسجّل بعد</p>${(C.notes||[]).length?`<div class="panel"><div class="arch"><h3>ملاحظات وأسباب</h3><span class="tag2">${C.date||C.month}</span></div><dl class="rvn">${C.notes.map(n=>`<div><dt>${n.h}</dt><dd>${n.t}</dd></div>`).join("")}</dl></div>`:""}`;
+ <p class="empty" style="margin:8px 0 0">عدد المتابعين · ${C.self_date?`المعهد ${C.self_date} · المنافسون ${C.date}`:(C.date||C.month)} · (—) لم يُسجّل بعد</p>${(C.notes||[]).length?`<div class="panel"><div class="arch"><h3>ملاحظات وأسباب</h3><span class="tag2">${C.date||C.month}</span></div><dl class="rvn">${C.notes.map(n=>`<div><dt>${n.h}</dt><dd>${n.t}</dd></div>`).join("")}</dl></div>`:""}`;
 }
 
 
