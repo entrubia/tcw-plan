@@ -268,7 +268,7 @@ ITEMS=data.items;EXTRA=data.extra;STORIES=data.stories||[];if(data.plan)PLAN=dat
  renderViews(data);renderMore(data);renderStories();renderCover(data);route();document.getElementById("gate").hidden=true;document.getElementById("app").hidden=false}
 let lb,lbc,nav,cnt;
 let slides=[],si=0;
-async function showSlide(){cnt.textContent=`${si+1} / ${slides.length}`;lbc.innerHTML=`<img src="${await url(slides[si])}" alt="شريحة ${si+1}">`;prepDl(slides[si],dlName+"_"+(si+1))}
+async function showSlide(){cnt.textContent=`${si+1} / ${slides.length}`;lbc.innerHTML=slides[si].type==="video/mp4"?`<video src="${await url(slides[si])}" controls playsinline autoplay></video>`:`<img src="${await url(slides[si])}" alt="شريحة ${si+1}">`;prepDl(slides[si],dlName+"_"+(si+1))}
 let dlName="TCW",dlFile=null,dlU="";
 function fname(it){return ["TCW",(it.iso||"").trim(),(it.typ||it.topic||"").replace(/[\\/:*?"<>|]/g,"").replace(/\s+/g,"_").slice(0,40)].filter(Boolean).join("_")}
 const EXT={"video/mp4":".mp4","image/jpeg":".jpg","image/png":".png"};
@@ -294,7 +294,7 @@ function renderViews(d){
  ${(()=>{const C=d.compare;if(!C)return "";return `<div class="panel"><div class="arch"><h3>${C.title}</h3><span class="tag2">${C.tag}</span></div><div class="tw"><table class="rank bl"><thead><tr><th>المنصة</th><th>11 أكتوبر</th><th>31 أكتوبر</th><th>التغير</th></tr></thead><tbody>${C.rows.map(r=>{const df=r[2]-r[1],pc=(df/r[1]*100).toFixed(1);return `<tr><td>${r[0]}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}</td><td class="${df>0?"up":df<0?"dn":""}" dir="ltr">${df>0?"+":""}${fmt(df)} (${df>0?"+":""}${pc}%)</td></tr>`}).join("")}</tbody></table></div><p class="empty" style="margin:10px 0 0">${C.note}</p></div>`})()}`;
  document.getElementById("vArchive").innerHTML=`<div class="vh"><h2>الأرشيف</h2><p>كل خطة تنتهي تنتقل إلى هنا كما هي: محتواها ومعايناتها وتقريرها.</p></div>`+ARCH.map((A,j)=>{const [h]=weeksHTML(new Date(A.start+"T00:00:00"),A.weeks,"all","arch");const n=ITEMS.filter(x=>x.iso>=A.start&&x.iso<=A.end).length;return `<div class="panel"><div class="arch"><div><h3>${A.title}</h3><p class="empty" style="margin:2px 0 0">${n} بندًا · ${A.note||""}</p></div>${A.file?`<div class="dlr" style="margin:0"><button data-pdf="${A.file.m.id}" data-fn="${A.file.fn}">⬇ ${A.file.t}</button></div>`:""}</div><div class="archw">${h}</div></div>`}).join("");
 }
-function renderStories(){const C=[["الكل","all"],["الدورات","دورات"],["الدبلومات","دبلومات"],["الورش","ورش"],["العروض","عروض"],["التواصل والخدمات","تواصل"],["منتهي","exp"]];
+function renderStories(){const C=[["الكل","all"],["الدورات","دورات"],["الدبلومات","دبلومات"],["الورش","ورش"],["العروض","عروض"],["المحتوى التعليمي","تعليمي"],["التواصل والخدمات","تواصل"],["منتهي","exp"]];
  const ex=g=>g.exp&&Date.now()>=Date.parse(g.exp);
  const order=STORIES.map((g,i)=>[g,i]).sort((A,B)=>(ex(A[0])-ex(B[0]))||B[0].iso.localeCompare(A[0].iso));
  const v=document.getElementById("vStories");
