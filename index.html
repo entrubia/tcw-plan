@@ -82,7 +82,7 @@ details.wk{border-bottom:1px solid var(--line);padding-bottom:4px}
 .s-جاهز{background:var(--ok);color:var(--ok-ink)}.s-مخطط{background:var(--plan);color:var(--plan-ink)}.s-بانتظار{background:var(--wait);color:var(--wait-ink)}
 .s-منشور{background:var(--ink);color:var(--bg)}.s-مجدول{background:var(--chip-car);color:var(--chip-car-ink)}
 .sch{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--chip-car-ink);background:var(--chip-car);border-radius:8px;padding:6px 10px}
-.perf{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px}
+.perf{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:4px}
 .perf div{background:var(--sunk);border-radius:8px;padding:6px 4px;text-align:center}
 .perf b{display:block;font-weight:800;font-size:15px;line-height:1.2;font-variant-numeric:tabular-nums}
 .perf span{display:block;font-size:11px;color:var(--muted)}
@@ -226,7 +226,7 @@ function mediaHTML(it,i){const m=it.m;
 
 let TOP=new Set();
 const eff=it=>it.st==='مجدول'&&it.at&&Date.now()>=Date.parse(it.at)?'منشور':it.st;
-function perfHTML(it){const p=it.perf;if(p)return `<div class="perf"><div><b>${fmt(p.views)}</b><span>مشاهدة</span></div><div><b>${fmt(p.eng)}</b><span>تفاعل</span></div><div><b>${fmt(p.inq)}</b><span>استفسار</span></div></div>`;
+function perfHTML(it){const p=it.perf;if(p)return `<div class="perf"><div><b>${fmt(p.views)}</b><span>مشاهدة</span></div><div><b>${fmt(p.eng)}</b><span>تفاعل</span></div></div>`;
  return it.st==="منشور"&&!it.sch?`<div class="perf wait">الأرقام تُضاف بعد 48 ساعة من النشر</div>`:""}
 function card(it,i){return `<article class="card">${TOP.has(i)?`<span class="top">الأعلى أداءً</span>`:""}${mediaHTML(it,i)}<div class="body">
  <div class="meta"><span>${it.day} ${it.date}</span><span class="chip k-${it.kind}">${it.kind}</span></div>
@@ -261,7 +261,7 @@ ITEMS=data.items;EXTRA=data.extra;STORIES=data.stories||[];if(data.plan)PLAN=dat
  const ready=ITEMS.filter(x=>x.iso>=PLAN.start&&x.st==="جاهز").length;
  const CUR=ITEMS.filter(x=>x.iso>=PLAN.start);const stc=s=>CUR.filter(x=>eff(x)===s).length;document.getElementById("prog").innerHTML=`${[["منشور",stc("منشور")],["مجدول",stc("مجدول")],["جاهز",ready]].filter(([,c])=>c).map(([k,c])=>`<b>${c}</b> ${k}`).join(" · ")} · من ${CUR.length} بندًا`;
  document.getElementById("extraGrid").innerHTML=EXTRA.map((x,i)=>`<article class="card"><button class="media" data-x="${i}" aria-label="عرض القالب: ${x.topic}"><img data-k="${x.m.src.id}" alt="" class="loading"></button><div class="body"><div class="topic">${x.topic}</div></div></article>`).join("");
- const ranked=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.perf).sort((A,B)=>(B[0].perf.inq-A[0].perf.inq)||(B[0].perf.views-A[0].perf.views));
+ const ranked=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.perf).sort((A,B)=>B[0].perf.views-A[0].perf.views);
  TOP=new Set(ranked.slice(0,3).map(([,i])=>i));window.RANKED=ranked;
  render("all");
  document.querySelectorAll(".filters button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".filters button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));render(b.dataset.f)}));
@@ -285,7 +285,7 @@ const fmt=v=>v===null||v===undefined?"—":(typeof v==="number"?v.toLocaleString
 function renderViews(d){
  const RP=d.reports||[];
  document.getElementById("vReports").innerHTML=`<div class="vh"><h2>التقارير</h2><p>التقرير الشهري يصدر أول كل شهر، وتقرير الإنجاز الأسبوعي كل خميس. اضغطي على أي ملف لتحميله.</p></div>`+RP.map(r=>`<div class="panel"><div class="arch"><h3>${r.title}</h3><span class="tag2">${r.tag}</span></div>${r.kv?`<div class="kv">${r.kv.map(k=>`<div><b>${k[0]}</b><span>${k[1]}</span></div>`).join("")}</div>`:""}${r.ul?`<ul>${r.ul.map(i=>`<li>${i}</li>`).join("")}</ul>`:""}${r.files&&r.files.length?`<div class="dlr">${r.files.map(f=>`<button data-pdf="${f.m.id}" data-fn="${f.fn}">⬇ ${f.t}</button>`).join("")}</div>`:""}</div>`).join("")+(()=>{const R=window.RANKED||[];
- const body=R.length?`<div class="tw"><table class="rank"><thead><tr><th>#</th><th>المحتوى</th><th>المنصة</th><th>التاريخ</th><th>المشاهدات</th><th>التفاعل</th><th>الاستفسارات</th></tr></thead><tbody>${R.map(([x],k)=>`<tr><td>${k+1}</td><td>${x.topic}</td><td>${x.plat}</td><td>${x.date}</td><td>${fmt(x.perf.views)}</td><td>${fmt(x.perf.eng)}</td><td>${fmt(x.perf.inq)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="empty" style="margin:8px 0 0">يُضاف كل محتوى هنا بعد نشره بيومين، مرتبًا حسب الاستفسارات ثم المشاهدات.</p>`;
+ const body=R.length?`<div class="tw"><table class="rank"><thead><tr><th>#</th><th>المحتوى</th><th>المنصة</th><th>التاريخ</th><th>المشاهدات</th><th>التفاعل</th></tr></thead><tbody>${R.map(([x],k)=>`<tr><td>${k+1}</td><td>${x.topic}</td><td>${x.plat}</td><td>${x.date}</td><td>${fmt(x.perf.views)}</td><td>${fmt(x.perf.eng)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="empty" style="margin:8px 0 0">يُضاف كل محتوى هنا بعد نشره بيومين، مرتبًا حسب المشاهدات.</p>`;
  return `<div class="panel"><div class="arch"><h3>أداء المحتوى</h3><span class="tag2">${R.length} منشور</span></div>${body}</div>`})();
  document.getElementById("vCompare").innerHTML=`<div class="vh"><h2>قبل وبعد</h2><p>نقطة البداية هي أرقام الحسابات يوم 11 أكتوبر 2026، أول يوم في الخطة. كل شهر تُضاف أرقامه هنا، ويظهر الفرق عن نقطة البداية.</p></div>
  ${(()=>{const B=d.baseline;if(!B)return '<div class="panel"><div class="arch"><h3>نقطة البداية</h3><span class="tag2">تُسجّل 11 أكتوبر</span></div><p class="empty" style="margin:8px 0 0">متابعو كل منصة، ومشاهداتها، ومحادثات الواتساب في أول يوم من الخطة.</p></div>';
