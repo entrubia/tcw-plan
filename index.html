@@ -218,7 +218,7 @@ const play='<span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" 
 function stClass(s){return s.startsWith("بانتظار")?"s-بانتظار":"s-"+s}
 function thumbOf(m){return m.t==="video"?m.poster:(m.t==="car"?m.src[0]:m.src)}
 function mediaHTML(it,i){const m=it.m;
- if(!m) return `<div class="ph">قيد الإنتاج<br>${it.exe}</div>`;
+ if(!m) return `<div class="ph">${eff(it)==="منشور"?"منشور":"قيد الإنتاج"}<br>${it.exe}</div>`;
  const im=`<img data-k="${thumbOf(m).id}" alt="" class="loading">`;
  if(m.t==="video") return `<button class="media" data-i="${i}" aria-label="تشغيل الفيديو: ${it.topic}">${im}${play}<span class="badge">فيديو</span></button>`;
  if(m.t==="car") return `<button class="media" data-i="${i}" aria-label="عرض الكاروسيل: ${it.topic}">${im}<span class="badge">${m.src.length} شرائح</span></button>`;
